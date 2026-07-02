@@ -2,11 +2,20 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: component-deploy
 
-# Standalone component-deployment demo. Runnable on its own via "Run workflow".
-# Mock/echo only: it renders the sample k8s manifest and runs a CLIENT-SIDE
-# kubectl dry-run (no live cluster needed), then prints deployment evidence.
+# Simulated component deployment.
+# - Called by the application's deployer (workflow_call), or run standalone (workflow_dispatch).
+# - Mock/echo only: it SIMULATES a deploy and publishes evidence. It does not
+#   deploy to a real cluster.
 
 on:
+  workflow_call:
+    inputs:
+      artifact-id:
+        type: string
+        required: true
+      environment:
+        type: string
+        required: true
   workflow_dispatch:
     inputs:
       artifact-id:
@@ -20,56 +29,30 @@ on:
           - staging
           - prod
         default: dev
+
 jobs:
-  pre-deploy-checks:
-    steps:
-      - name: Print deployment context
-        uses: docker://alpine:3.20
-        shell: sh
-        run: |
-          echo "Deploying artifact: ${{ inputs.artifact-id }}"
-          echo "Target environment: ${{ inputs.environment }}"
-      - name: Validate environment policy
-        uses: docker://alpine:3.20
-        shell: sh
-        run: |
-          if [ "${{ inputs.environment }}" = "prod" ]; then
-            echo "Production deployment detected: approval and change ticket required"
-          else
-            echo "Non-production deployment: standard checks passed"
-          fi
-
   deploy:
-    needs:
-      - pre-deploy-checks
     steps:
-      - name: Checkout source
-        uses: https://github.com/cloudbees-io/checkout@v1
-      - name: Render Kubernetes manifests
+      - name: Simulate deployment
         uses: docker://alpine:3.20
         shell: sh
         run: |
-          echo "Rendering Kubernetes manifests for ${{ inputs.environment }}"
-          sed "s|IMAGE_PLACEHOLDER|ghcr.io/example/orders-api:${{ inputs.artifact-id }}|g" k8s/deployment.yaml > rendered-deployment.yaml
-          cat rendered-deployment.yaml
-      - name: Deploy with kubectl dry run
-        uses: docker://bitnami/kubectl:latest
-        shell: sh
-        run: |
-          echo "Demo mode: validating Kubernetes manifests without requiring a live cluster"
-          kubectl apply --dry-run=client -f k8s/ || true
-
-  post-deploy-evidence:
-    needs:
-      - deploy
-    steps:
-      - name: Generate deployment evidence
-        uses: docker://alpine:3.20
-        shell: sh
-        run: |
-          echo "Deployment evidence"
-          echo "application=customer-portal"
-          echo "component=orders-api"
-          echo "artifact=${{ inputs.artifact-id }}"
-          echo "environment=${{ inputs.environment }}"
-          echo "status=success"
+          echo "== Simulated component deployment =="
+          echo "Component:    orders-api"
+          echo "Artifact:     ${{ inputs.artifact-id }}"
+          echo "Environment:  ${{ inputs.environment }}"
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            echo "Production policy: approval and change ticket required (talking point)"
+          else
+            echo "Non-production policy: standard checks passed"
+          fi
+          echo "Deploy status: SUCCESS (simulated)"
+      - name: Publish evidence
+        uses: https://github.com/cloudbees-io/publish-evidence-item@v1
+        with:
+          content: |-
+            ## Component deployment (simulated)
+            - Component: orders-api
+            - Artifact: ${{ inputs.artifact-id }}
+            - Environment: ${{ inputs.environment }}
+            - Status: **success** (simulated)
