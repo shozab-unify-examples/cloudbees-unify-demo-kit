@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="orders-api" tests="16" failures="1" errors="0" skipped="1" time="5.128">
+  <testsuite name="orders_api.tests.test_orders" tests="7" failures="0" errors="0" skipped="0" time="2.104">
+    <testcase classname="test_orders.OrderApiTests" name="test_create_order_returns_201" time="0.214"/>
+    <testcase classname="test_orders.OrderApiTests" name="test_get_order_by_id" time="0.108"/>
+    <testcase classname="test_orders.OrderApiTests" name="test_list_orders_paginated" time="0.331"/>
+    <testcase classname="test_orders.OrderApiTests" name="test_update_order_status" time="0.192"/>
+    <testcase classname="test_orders.OrderApiTests" name="test_cancel_order" time="0.145"/>
+    <testcase classname="test_orders.OrderApiTests" name="test_order_not_found_returns_404" time="0.087"/>
+    <testcase classname="test_orders.OrderApiTests" name="test_invalid_payload_returns_400" time="0.121"/>
+  </testsuite>
+  <testsuite name="orders_api.tests.test_health" tests="3" failures="0" errors="0" skipped="0" time="0.402">
+    <testcase classname="test_health.HealthTests" name="test_health_endpoint_ok" time="0.061"/>
+    <testcase classname="test_health.HealthTests" name="test_readiness_probe" time="0.070"/>
+    <testcase classname="test_health.HealthTests" name="test_liveness_probe" time="0.058"/>
+  </testsuite>
+  <testsuite name="orders_api.tests.test_payments" tests="6" failures="1" errors="0" skipped="1" time="2.622">
+    <testcase classname="test_payments.PaymentTests" name="test_authorize_payment" time="0.402"/>
+    <testcase classname="test_payments.PaymentTests" name="test_capture_payment" time="0.377"/>
+    <testcase classname="test_payments.PaymentTests" name="test_refund_payment" time="0.451"/>
+    <testcase classname="test_payments.PaymentTests" name="test_payment_idempotency_key" time="0.398"/>
+    <testcase classname="test_payments.PaymentTests" name="test_retry_on_gateway_timeout" time="0.512">
+      <failure message="AssertionError: expected 3 retries, got 2" type="AssertionError">
+        Traceback (most recent call last):
+          File "test_payments.py", line 88, in test_retry_on_gateway_timeout
+            self.assertEqual(client.retry_count, 3)
+        AssertionError: expected 3 retries, got 2
+      </failure>
+    </testcase>
+    <testcase classname="test_payments.PaymentTests" name="test_partial_refund_rounding" time="0.000">
+      <skipped message="pending FIN-2214: decimal rounding rule under review"/>
+    </testcase>
+  </testsuite>
+</testsuites>
