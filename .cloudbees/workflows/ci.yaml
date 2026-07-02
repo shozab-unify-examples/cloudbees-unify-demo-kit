@@ -9,6 +9,9 @@ on:
     branches:
       - main
   workflow_dispatch: {}
+permissions:
+  id-token: write
+  contents: read
 jobs:
   validate:
     steps:
@@ -101,19 +104,28 @@ jobs:
           }
           JSON
           cat build/release-metadata.json
+      - name: Register build artifact
+        id: register-artifact
+        uses: cloudbees-io/register-build-artifact@v2
+        with:
+          name: orders-api
+          version: 1.4.${{ cloudbees.run_number }}
+          url: docker.io/cloudbeesdemo/orders-api:1.4.${{ cloudbees.run_number }}
       - name: Publish evidence
         uses: https://github.com/cloudbees-io/publish-evidence-item@v1
         with:
           content: |-
-            ## Package — build metadata
+            ## Package — build metadata + registered artifact
             - Application: customer-portal
             - Component: orders-api
             - Version: 1.4.${{ cloudbees.run_number }}
+            - Registered artifact ID: ${{ steps.register-artifact.outputs.artifact-id }}
+            - Artifact URL: docker.io/cloudbeesdemo/orders-api:1.4.${{ cloudbees.run_number }}
             - Commit: ${{ cloudbees.scm.sha }}
             - Security policy: passed
             - Tests: passed
     needs:
       - security-scan
     outputs:
-      artifact-id: orders-api:1.4.${{ cloudbees.run_number }}
-      release-version: 1.4.${{ cloudbees.run_number }}
+      artifact-id: ${{ steps.register-artifact.outputs.artifact-id }}
+      artifact-version: 1.4.${{ cloudbees.run_number }}

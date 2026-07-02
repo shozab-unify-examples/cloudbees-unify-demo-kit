@@ -18,8 +18,8 @@ A lightweight starter kit for SE candidates building a CloudBees Unify demo as p
 
 Workflows (runnable standalone via **Run workflow**):
 
-- `.cloudbees/workflows/ci.yaml` — CI: validate → unit tests → security scan → package (mock). Each job publishes evidence to the run's Evidence tab.
-- `.cloudbees/workflows/deploy.yaml` — standalone component deploy (renders the sample k8s manifest, client-side `kubectl` dry-run — no live cluster)
+- `.cloudbees/workflows/ci.yaml` — CI: validate → unit tests → security scan → package. The package job **registers a build artifact** (`orders-api` version `1.4.<run>`) with CloudBees Unify so releases have an artifact to deploy. Each job publishes evidence to the run's Evidence tab.
+- `.cloudbees/workflows/deploy.yaml` — simulated component deploy (callable by the application's deployer via `workflow_call`, or run standalone). Mock/echo only — no real cluster — and publishes evidence.
 - `.github/workflows/ci.yml` — GitHub Actions CI alternative, to show external-toolchain integration
 
 Supporting assets:
