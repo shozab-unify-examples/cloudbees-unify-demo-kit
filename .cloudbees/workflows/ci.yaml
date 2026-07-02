@@ -8,14 +8,7 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      customer_scenario:
-        type: choice
-        options:
-          - finsure-bank
-          - horizon-health
-        default: finsure-bank
+  workflow_dispatch: {}
 jobs:
   validate:
     steps:
@@ -78,7 +71,7 @@ jobs:
             "component": "orders-api",
             "version": "1.4.${{ cloudbees.run_number }}",
             "commit": "${{ cloudbees.scm.sha }}",
-            "scenario": "${{ inputs.customer_scenario }}",
+            "scenario": "candidate-demo",
             "securityPolicy": "passed",
             "testStatus": "passed"
           }
