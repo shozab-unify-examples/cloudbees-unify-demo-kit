@@ -10,9 +10,6 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      run_security_scan:
-        type: boolean
-        default: true
       customer_scenario:
         type: choice
         options:
@@ -51,7 +48,6 @@ jobs:
   security-scan:
     needs:
       - unit-tests
-    if: ${{ inputs.run_security_scan }}
     steps:
       - name: Checkout source
         uses: https://github.com/cloudbees-io/checkout@v1

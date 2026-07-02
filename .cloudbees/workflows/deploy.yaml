@@ -1,15 +1,12 @@
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: component-deploy
+
+# Standalone component-deployment demo. Runnable on its own via "Run workflow".
+# Mock/echo only: it renders the sample k8s manifest and runs a CLIENT-SIDE
+# kubectl dry-run (no live cluster needed), then prints deployment evidence.
+
 on:
-  workflow_call:
-    inputs:
-      artifact-id:
-        type: string
-        required: true
-      environment:
-        type: string
-        required: true
   workflow_dispatch:
     inputs:
       artifact-id:

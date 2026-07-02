@@ -1,36 +1,55 @@
-# CloudBees Unify Candidate Demo YAML Assets
+# CloudBees Unify Candidate Demo Kit
 
-This repo is a lightweight starter kit for SE candidates building a CloudBees Unify demo. It assumes the candidate has access to a CloudBees Unify organization and will fork this repository, connect it to Unify, and adapt the workflows for one of the provided customer scenarios.
+A lightweight starter kit for SE candidates building a CloudBees Unify demo as part of an interview.
+
+**Everything here is self-contained and mock/echo-based.** The workflows run green in any CloudBees Unify organization with **no clusters, secrets, registries, or third-party integrations required**. Fork it, connect it to Unify, and click **Run** — you get a clean, presentable pipeline in minutes. Then tailor the names and story to your chosen scenario.
+
+## Quick start
+
+1. **Fork** this repository.
+2. **Connect** the fork to your CloudBees Unify organization.
+3. Open any workflow under `.cloudbees/workflows/` and click **Run workflow** — they all succeed on their own with mock output.
+4. Pick a scenario and present the matching staged release workflow.
+
+That's it. No setup beyond connecting the repo.
 
 ## What is included
 
-- `.cloudbees/workflows/ci.yaml` - CloudBees Unify CI workflow starter
-- `.cloudbees/workflows/deploy.yaml` - component deploy workflow starter
-- `.cloudbees/workflows/deployer.yaml` - reusable application deployer workflow starter
-- `.cloudbees/workflows/release-finsure-bank.yaml` - staged release workflow for FinSure Bank
-- `.cloudbees/workflows/release-horizon-health.yaml` - staged release workflow for Horizon Health Systems
-- `.github/workflows/ci.yml` - GitHub Actions CI workflow alternative for candidates who want to show external toolchain integration
-- `k8s/` - Kubernetes manifests for a simple demo application
-- `helm/unify-demo-app/` - basic Helm chart for deployment storytelling
-- `manifests/` - sample release manifests for demo scenarios
-- `policies/` - mock governance, approval, and change-control YAML
-- `mock-data/` - mock Jira, ServiceNow, security, and release evidence data
+Workflows (all runnable standalone via **Run workflow**):
 
-## Suggested candidate demo path
+- `.cloudbees/workflows/ci.yaml` — CI: validate → unit tests → security scan → package (mock)
+- `.cloudbees/workflows/deploy.yaml` — standalone component deploy (renders the sample k8s manifest, client-side `kubectl` dry-run — no live cluster)
+- `.cloudbees/workflows/release-finsure-bank.yaml` — staged, **regulated** release: governance → staging → validation → approval → production → evidence
+- `.cloudbees/workflows/release-horizon-health.yaml` — standardized **golden-path** release: QA → validation → staging → summary
+- `.github/workflows/ci.yml` — GitHub Actions CI alternative, to show external-toolchain integration
 
-1. Fork this repository.
-2. Connect the forked repository to CloudBees Unify.
-3. Create or select an Application in Unify, such as `Customer Portal`.
-4. Create or select a Component, such as `orders-api`.
-5. Use `.cloudbees/workflows/ci.yaml` to show a build/test/security workflow.
-6. Use `.cloudbees/workflows/deploy.yaml` to show component deployment logic.
-7. Use `.cloudbees/workflows/deployer.yaml` to explain reusable deployment orchestration.
-8. Pick one scenario:
-   - FinSure Bank: governance, auditability, risk, approvals
-   - Horizon Health Systems: developer experience, release standardization, healthcare compliance
-9. Use the matching staged release workflow to tell the end-to-end story from build to staging to production.
-10. Use `mock-data/` and `policies/` as evidence during the presentation.
+Supporting assets (used as evidence / talking points):
 
-## Important note
+- `k8s/` — Kubernetes manifests for a simple demo app
+- `helm/unify-demo-app/` — basic Helm chart for deployment storytelling
+- `manifests/` — sample release manifests per scenario
+- `policies/` — mock governance, approval, and change-control YAML
+- `mock-data/` — mock Jira, ServiceNow, security, and release evidence data
 
-These files are intentionally starter assets. Candidates should tailor the story, names, environments, and demo flow to match the selected customer scenario.
+## The two scenarios
+
+- **FinSure Bank** (`release-finsure-bank.yaml`) — regulated financial services. Emphasize governance, auditability, risk, change tickets, and production approvals.
+- **Horizon Health Systems** (`release-horizon-health.yaml`) — healthcare / platform engineering. Emphasize developer experience, release standardization, and health-data compliance. (In this scenario `payments-api` is intentionally not deployed.)
+
+## Suggested demo path
+
+1. Show the repo structure — teams keep their existing tools; Unify orchestrates.
+2. Run `ci.yaml` to show a standardized build/test/security pipeline.
+3. Run `deploy.yaml` to show component deployment.
+4. Run the staged release workflow for your chosen scenario (FinSure or Horizon) to tell the end-to-end story.
+5. Use `policies/` and `mock-data/` as governance and audit-evidence talking points.
+6. Close on business outcomes: visibility, governance, orchestration, developer productivity, and preserving existing tool investments.
+
+## Customizing
+
+These are intentionally simple building blocks. To make the demo yours:
+
+- Rename the application/components to fit your scenario (e.g. `Customer Portal` / `orders-api`).
+- Adjust the mock component versions in the release workflows.
+- Add a real manual **approval gate** in the Unify Workflow Composer where the `production-approval` talking-point step is.
+- Add or remove a tool integration to match the customer's toolchain.

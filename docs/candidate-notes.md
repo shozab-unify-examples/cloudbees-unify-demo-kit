@@ -1,6 +1,6 @@
 # Candidate Notes
 
-You do not need to make every YAML file execute perfectly in your tenant. The goal is to use these as realistic building blocks for a customer-facing CloudBees Unify demo.
+Every workflow in this kit is self-contained and mock/echo-based, so it runs green in your tenant with no extra setup — no clusters, secrets, registries, or integrations. Fork, connect, and click **Run workflow**. Use these as realistic building blocks for a customer-facing CloudBees Unify demo, then tailor the story.
 
 Recommended customization:
 

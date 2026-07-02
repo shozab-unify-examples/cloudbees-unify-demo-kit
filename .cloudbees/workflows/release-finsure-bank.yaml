@@ -1,18 +1,22 @@
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: finsure-bank-regulated-release
+
+# Regulated, governed release demo for FinSure Bank.
+# Fully self-contained: every step is mock/echo, so it runs green in any
+# CloudBees Unify org with no clusters, secrets, or integrations required.
+# Story: governance review -> staging -> validation -> approval -> production -> evidence.
+
 on:
   workflow_dispatch:
     inputs:
-      manifest:
-        type: string
-        default: '{"orders-api":{"orders-api":{"deploy":true,"id":"orders-api:1.4.0"}},"payments-api":{"payments-api":{"deploy":true,"id":"payments-api:2.8.1"}},"web-frontend":{"web-frontend":{"deploy":true,"id":"web-frontend:3.2.0"}}}'
       change_ticket:
         type: string
         default: CHG-10482
       release_window:
         type: string
         default: Saturday 22:00-23:00 ET
+
 jobs:
   governance-review:
     steps:
@@ -20,20 +24,27 @@ jobs:
         uses: docker://alpine:3.20
         shell: sh
         run: |
-          echo "FinSure Bank governance review"
-          echo "Change ticket: ${{ inputs.change_ticket }}"
+          echo "== FinSure Bank governance review =="
+          echo "Release:        FinSure Bank Mobile Banking Release"
+          echo "Change ticket:  ${{ inputs.change_ticket }}"
           echo "Release window: ${{ inputs.release_window }}"
-          echo "Verifying tests, security scans, and approvals"
-          echo "Audit evidence: complete"
+          echo "Components:      orders-api:1.4.0, payments-api:2.8.1, web-frontend:3.2.0"
+          echo "Verifying unit tests, security scans, and approvals..."
+          echo "Audit evidence: COMPLETE"
 
   deploy-staging:
     needs:
       - governance-review
-    environment: staging
-    uses: ./.cloudbees/workflows/deployer.yaml
-    with:
-      manifest: ${{ inputs.manifest }}
-      environment: ${{ job.environment }}
+    steps:
+      - name: Deploy release to staging
+        uses: docker://alpine:3.20
+        shell: sh
+        run: |
+          echo "Deploying FinSure Bank release to STAGING"
+          for component in orders-api:1.4.0 payments-api:2.8.1 web-frontend:3.2.0; do
+            echo "  -> deploying $component"
+          done
+          echo "Staging deployment: SUCCESS"
 
   staging-validation:
     needs:
@@ -43,30 +54,36 @@ jobs:
         uses: docker://alpine:3.20
         shell: sh
         run: |
-          echo "Running smoke tests"
-          echo "Checking SLO dashboards"
-          echo "Validating audit controls"
-          echo "Staging validation passed"
+          echo "Running smoke tests..."
+          echo "Checking SLO dashboards..."
+          echo "Validating audit controls..."
+          echo "Staging validation: PASSED"
 
   production-approval:
     needs:
       - staging-validation
     steps:
-      - name: Manual approval placeholder
+      - name: Production approval (demo talking point)
         uses: docker://alpine:3.20
         shell: sh
         run: |
-          echo "Demo talking point: insert a production approval step in CloudBees Unify Workflow Composer"
-          echo "Approvers: Release Manager, Security, Application Owner"
+          echo "TALKING POINT: add a manual approval gate here in the CloudBees Unify Workflow Composer."
+          echo "Suggested approvers: Release Manager, Security, Application Owner"
+          echo "Approval: SIMULATED / APPROVED"
 
   deploy-production:
     needs:
       - production-approval
-    environment: prod
-    uses: ./.cloudbees/workflows/deployer.yaml
-    with:
-      manifest: ${{ inputs.manifest }}
-      environment: ${{ job.environment }}
+    steps:
+      - name: Deploy release to production
+        uses: docker://alpine:3.20
+        shell: sh
+        run: |
+          echo "Deploying FinSure Bank release to PRODUCTION"
+          for component in orders-api:1.4.0 payments-api:2.8.1 web-frontend:3.2.0; do
+            echo "  -> deploying $component"
+          done
+          echo "Production deployment: SUCCESS"
 
   release-evidence:
     needs:
@@ -76,5 +93,10 @@ jobs:
         uses: docker://alpine:3.20
         shell: sh
         run: |
-          echo "Release completed for FinSure Bank"
-          echo "Evidence package: tests, scans, approvals, deployments, change ticket"
+          echo "== Release evidence package =="
+          echo "Unit tests:    passed"
+          echo "Security scan: passed"
+          echo "Approvals:     complete"
+          echo "Deployments:   staging + production"
+          echo "Change ticket: ${{ inputs.change_ticket }}"
+          echo "Release COMPLETE for FinSure Bank"
