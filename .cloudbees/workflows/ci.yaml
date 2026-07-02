@@ -8,14 +8,7 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      customer_scenario:
-        type: choice
-        options:
-          - finsure-bank
-          - horizon-health
-        default: finsure-bank
+  workflow_dispatch: {}
 jobs:
   validate:
     steps:
@@ -30,6 +23,15 @@ jobs:
           test -f k8s/service.yaml
           test -f helm/unify-demo-app/Chart.yaml
           echo "Repository structure is ready"
+      - name: Publish evidence
+        uses: https://github.com/cloudbees-io/publish-evidence-item@v1
+        with:
+          content: |-
+            ## Validate — repository structure
+            - `k8s/deployment.yaml`: present
+            - `k8s/service.yaml`: present
+            - `helm/unify-demo-app/Chart.yaml`: present
+            - Status: **ready**
 
   unit-tests:
     needs:
@@ -44,6 +46,15 @@ jobs:
           echo "Installing dependencies"
           echo "Running unit tests for orders-api"
           echo "PASS: 48 tests passed"
+      - name: Publish evidence
+        uses: https://github.com/cloudbees-io/publish-evidence-item@v1
+        with:
+          content: |-
+            ## Unit tests — orders-api
+            - Tests run: 48
+            - Passed: 48
+            - Failed: 0
+            - Status: **passed**
 
   security-scan:
     needs:
@@ -60,6 +71,16 @@ jobs:
           echo "Critical vulnerabilities: 0"
           echo "High vulnerabilities: 0"
           echo "Policy: passed"
+      - name: Publish evidence
+        uses: https://github.com/cloudbees-io/publish-evidence-item@v1
+        with:
+          content: |-
+            ## Security scan — orders-api (mock SAST + dependency)
+            - Critical: 0
+            - High: 0
+            - Medium: 3
+            - Low: 12
+            - Policy: **passed**
 
   package:
     needs:
@@ -78,12 +99,23 @@ jobs:
             "component": "orders-api",
             "version": "1.4.${{ cloudbees.run_number }}",
             "commit": "${{ cloudbees.scm.sha }}",
-            "scenario": "${{ inputs.customer_scenario }}",
+            "scenario": "candidate-demo",
             "securityPolicy": "passed",
             "testStatus": "passed"
           }
           JSON
           cat build/release-metadata.json
+      - name: Publish evidence
+        uses: https://github.com/cloudbees-io/publish-evidence-item@v1
+        with:
+          content: |-
+            ## Package — build metadata
+            - Application: customer-portal
+            - Component: orders-api
+            - Version: 1.4.${{ cloudbees.run_number }}
+            - Commit: ${{ cloudbees.scm.sha }}
+            - Security policy: passed
+            - Tests: passed
     outputs:
       artifact-id: orders-api:1.4.${{ cloudbees.run_number }}
       release-version: 1.4.${{ cloudbees.run_number }}
