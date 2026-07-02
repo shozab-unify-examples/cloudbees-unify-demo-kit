@@ -32,7 +32,6 @@ jobs:
             - `k8s/service.yaml`: present
             - `helm/unify-demo-app/Chart.yaml`: present
             - Status: **ready**
-
   unit-tests:
     needs:
       - validate
@@ -55,7 +54,6 @@ jobs:
             - Passed: 48
             - Failed: 0
             - Status: **passed**
-
   security-scan:
     needs:
       - unit-tests
@@ -81,14 +79,12 @@ jobs:
             - Medium: 3
             - Low: 12
             - Policy: **passed**
-
   package:
-    needs:
-      - security-scan
     steps:
       - name: Checkout source
         uses: https://github.com/cloudbees-io/checkout@v1
       - name: Create build metadata
+        kind: build
         uses: docker://alpine:3.20
         shell: sh
         run: |
@@ -116,6 +112,8 @@ jobs:
             - Commit: ${{ cloudbees.scm.sha }}
             - Security policy: passed
             - Tests: passed
+    needs:
+      - security-scan
     outputs:
       artifact-id: orders-api:1.4.${{ cloudbees.run_number }}
       release-version: 1.4.${{ cloudbees.run_number }}
