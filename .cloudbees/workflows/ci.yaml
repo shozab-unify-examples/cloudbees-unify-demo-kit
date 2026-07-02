@@ -45,43 +45,46 @@ jobs:
         uses: docker://node:20-alpine
         shell: sh
         run: |
-          echo "Installing dependencies"
-          echo "Running unit tests for orders-api"
-          echo "PASS: 48 tests passed"
+          echo "Running unit tests for orders-api (recorded results in test-reports/junit.xml)"
+          echo "14 passed, 1 failed, 1 skipped"
+      - name: Publish test results
+        uses: cloudbees-io/publish-test-results@v2
+        continue-on-error: true
+        with:
+          test-type: JUNIT
+          results-path: test-reports/junit.xml
       - name: Publish evidence
         uses: https://github.com/cloudbees-io/publish-evidence-item@v1
         with:
           content: |-
             ## Unit tests — orders-api
-            - Tests run: 48
-            - Passed: 48
-            - Failed: 0
-            - Status: **passed**
+            - Tests: 16
+            - Passed: 14
+            - Failed: 1 (`test_retry_on_gateway_timeout`)
+            - Skipped: 1
+            - Results published to the **Test results** tab
   security-scan:
     needs:
       - unit-tests
     steps:
       - name: Checkout source
         uses: https://github.com/cloudbees-io/checkout@v1
-      - name: Mock SAST and dependency scan
+      - name: Note on automatic security scanning
         uses: docker://alpine:3.20
         shell: sh
         run: |
-          echo "Running mock SAST scan"
-          echo "Running mock dependency scan"
-          echo "Critical vulnerabilities: 0"
-          echo "High vulnerabilities: 0"
-          echo "Policy: passed"
+          echo "CloudBees Unify automatically scans connected repositories for"
+          echo "secrets and vulnerabilities."
+          echo "Findings appear in the component's Security tab — including the"
+          echo "hardcoded credential intentionally added in src/config.py."
       - name: Publish evidence
         uses: https://github.com/cloudbees-io/publish-evidence-item@v1
         with:
           content: |-
-            ## Security scan — orders-api (mock SAST + dependency)
-            - Critical: 0
-            - High: 0
-            - Medium: 3
-            - Low: 12
-            - Policy: **passed**
+            ## Security — automatic scanning
+            CloudBees Unify automatically scans this repository. Findings — including
+            the **hardcoded credential** in `src/config.py` — are shown in the
+            component's **Security** tab for triage and remediation tracking.
   package:
     steps:
       - name: Checkout source
