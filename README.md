@@ -1,55 +1,44 @@
-# CloudBees Unify Candidate Demo Kit
+# CloudBees Unify Candidate Demo — Component (CI + Deploy)
 
-A lightweight starter kit for SE candidates building a CloudBees Unify demo as part of an interview.
+A lightweight starter kit for SE candidates building a CloudBees Unify demo as part of an interview. This is the **Component** repository: continuous integration (build/test/scan) and component deployment for the `orders-api` component.
 
-**Everything here is self-contained and mock/echo-based.** The workflows run green in any CloudBees Unify organization with **no clusters, secrets, registries, or third-party integrations required**. Fork it, connect it to Unify, and click **Run** — you get a clean, presentable pipeline in minutes. Then tailor the names and story to your chosen scenario.
+> **Release Orchestration lives in a separate repo.** In CloudBees Unify an Application and a Component cannot be the same repository, so the staged, governed **release workflows** are in the Application repo:
+> **[cb-demos/cloudbees-unify-demo-app](https://github.com/cb-demos/cloudbees-unify-demo-app)**
+
+**Everything here is self-contained and mock/echo-based.** The workflows run green in any CloudBees Unify organization with **no clusters, secrets, registries, or third-party integrations required**. Fork it, connect it to Unify, and click **Run**.
 
 ## Quick start
 
 1. **Fork** this repository.
-2. **Connect** the fork to your CloudBees Unify organization.
-3. Open any workflow under `.cloudbees/workflows/` and click **Run workflow** — they all succeed on their own with mock output.
-4. Pick a scenario and present the matching staged release workflow.
-
-That's it. No setup beyond connecting the repo.
+2. **Connect** the fork to your CloudBees Unify organization as a **Component**.
+3. Open a workflow under `.cloudbees/workflows/` and click **Run workflow** — they succeed on their own with mock output.
+4. For the end-to-end release story, also connect the [application repo](https://github.com/cb-demos/cloudbees-unify-demo-app) and run one of its release workflows.
 
 ## What is included
 
-Workflows (all runnable standalone via **Run workflow**):
+Workflows (runnable standalone via **Run workflow**):
 
-- `.cloudbees/workflows/ci.yaml` — CI: validate → unit tests → security scan → package (mock)
+- `.cloudbees/workflows/ci.yaml` — CI: validate → unit tests → security scan → package (mock). Each job publishes evidence to the run's Evidence tab.
 - `.cloudbees/workflows/deploy.yaml` — standalone component deploy (renders the sample k8s manifest, client-side `kubectl` dry-run — no live cluster)
-- `.cloudbees/workflows/release-finsure-bank.yaml` — staged, **regulated** release: governance → staging → validation → approval → production → evidence
-- `.cloudbees/workflows/release-horizon-health.yaml` — standardized **golden-path** release: QA → validation → staging → summary
 - `.github/workflows/ci.yml` — GitHub Actions CI alternative, to show external-toolchain integration
 
-Supporting assets (used as evidence / talking points):
+Supporting assets:
 
 - `k8s/` — Kubernetes manifests for a simple demo app
 - `helm/unify-demo-app/` — basic Helm chart for deployment storytelling
-- `manifests/` — sample release manifests per scenario
-- `policies/` — mock governance, approval, and change-control YAML
-- `mock-data/` — mock Jira, ServiceNow, security, and release evidence data
-
-## The two scenarios
-
-- **FinSure Bank** (`release-finsure-bank.yaml`) — regulated financial services. Emphasize governance, auditability, risk, change tickets, and production approvals.
-- **Horizon Health Systems** (`release-horizon-health.yaml`) — healthcare / platform engineering. Emphasize developer experience, release standardization, and health-data compliance. (In this scenario `payments-api` is intentionally not deployed.)
 
 ## Suggested demo path
 
 1. Show the repo structure — teams keep their existing tools; Unify orchestrates.
-2. Run `ci.yaml` to show a standardized build/test/security pipeline.
+2. Run `ci.yaml` to show a standardized build/test/security pipeline, then walk its **Evidence** tab.
 3. Run `deploy.yaml` to show component deployment.
-4. Run the staged release workflow for your chosen scenario (FinSure or Horizon) to tell the end-to-end story.
-5. Use `policies/` and `mock-data/` as governance and audit-evidence talking points.
-6. Close on business outcomes: visibility, governance, orchestration, developer productivity, and preserving existing tool investments.
+4. Switch to the **[application repo](https://github.com/cb-demos/cloudbees-unify-demo-app)** and run a staged release workflow (FinSure Bank or Horizon Health) to tell the end-to-end governance/release story with per-job evidence.
+5. Close on business outcomes: visibility, governance, orchestration, developer productivity, and preserving existing tool investments.
 
 ## Customizing
 
 These are intentionally simple building blocks. To make the demo yours:
 
 - Rename the application/components to fit your scenario (e.g. `Customer Portal` / `orders-api`).
-- Adjust the mock component versions in the release workflows.
-- Add a real manual **approval gate** in the Unify Workflow Composer where the `production-approval` talking-point step is.
 - Add or remove a tool integration to match the customer's toolchain.
+- Pair with the application repo to show the full **build → release** story across a Component and an Application.
